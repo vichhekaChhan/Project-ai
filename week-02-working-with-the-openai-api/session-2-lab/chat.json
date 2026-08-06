@@ -1,0 +1,14 @@
+[
+  {
+    "role": "system",
+    "content": "You are a helpful programming assistant.\nExplain concepts clearly to a Year 3 software engineering student.\n"
+  },
+  {
+    "role": "user",
+    "content": "Can you give me a 1-sentence summary of what recursion is?"
+  },
+  {
+    "role": "assistant",
+    "content": "Recursion is a programming technique where a function solves a problem by calling itself with a smaller or simpler version of the same problem, until it reaches a base case that stops the calls."
+  }
+]

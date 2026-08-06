@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import argparse
 import sys
+import json
 
 import config
 from llm import LLMService, LLMError, ConfigurationError
@@ -61,6 +62,8 @@ Commands:
   /tokens <n>           change the maximum output tokens
   /usage                show total tokens used this session
   /clear                clear the conversation history
+  /save <file>          save the conversation history to a JSON file
+  /load <file>          load the conversation history from a JSON file
   /quit                 exit
 """
 
@@ -113,6 +116,16 @@ class Session:
         elif cmd == "/clear":
             self.reset_conversation()
             print("Conversation cleared.")
+        elif cmd == "/save":
+            if not arg:
+                print("Usage: /save <file>")
+            else:
+                self._save_conversation(arg)
+        elif cmd == "/load":
+            if not arg:
+                print("Usage: /load <file>")
+            else:
+                self._load_conversation(arg)
         else:
             print(f"Unknown command: {cmd}. Type /help.")
         return True
@@ -139,6 +152,36 @@ class Session:
         old = getattr(self.service, attr)
         setattr(self.service, attr, value)
         print(f"{attr} changed from {old} -> {value}")
+
+    def _save_conversation(self, filename: str) -> None:
+        try:
+            with open(filename, 'w', encoding='utf-8') as f:
+                json.dump(self.messages, f, indent=2)
+            print(f"Conversation saved to {filename}")
+        except Exception as e:
+            print(f"Failed to save: {e}")
+
+    def _load_conversation(self, filename: str) -> None:
+        try:
+            with open(filename, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            
+            if not isinstance(data, list):
+                print("Invalid file format: must be a list of messages.")
+                return
+            for msg in data:
+                if not isinstance(msg, dict) or "role" not in msg or "content" not in msg:
+                    print("Invalid file format: each message must have a 'role' and 'content'.")
+                    return
+            
+            self.messages = data
+            print(f"Conversation loaded from {filename}")
+        except FileNotFoundError:
+            print(f"File not found: {filename}")
+        except json.JSONDecodeError:
+            print("Failed to load: Invalid JSON format.")
+        except Exception as e:
+            print(f"Failed to load: {e}")
 
     # ---- one turn --------------------------------------------------------
     def ask_turn(self, user_input: str) -> None:

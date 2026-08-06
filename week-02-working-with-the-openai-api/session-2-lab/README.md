@@ -65,6 +65,7 @@ python main.py --persona tutor --temperature 0.4 --max-tokens 500 --stream
 ```
 /help        /persona <name>     /temperature <value>
 /tokens <n>  /usage              /clear            /quit
+/save <file> /load <file>
 ```
 
 ## How the requirements map to the code
